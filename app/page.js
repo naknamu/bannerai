@@ -1,95 +1,130 @@
+"use client";
+
 import Image from "next/image";
-import styles from "./page.module.css";
+import { useEffect, useState, useRef } from "react";
+import { generateImage } from "./actions";
+import style from "./page.module.css";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import CircularProgress from "@mui/material/CircularProgress";
+import Draggable from "./components/Draggable";
+import DownloadImage from "./components/DownloadImage";
 
 export default function Home() {
+  const [title, useTitle] = useState("");
+  const [detail, useDetail] = useState("");
+  const [base64String, setBase64String] = useState([]);
+  const [isGenerated, setIsGenerated] = useState(false);
+  const [isDetailEmpty, setIsDetailEmpty] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const canvasRef = useRef(null);
+  const imageRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const img = imageRef.current;
+
+    if (img) {
+      ctx.drawImage(img, 0, 0);
+      ctx.font = '40px Roboto';
+      ctx.fillText(title, 100, 100);
+    }
+  
+  }, [title]);
+
+  const handleGenerate = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    if (detail === "") {
+      setIsDetailEmpty(true);
+      return;
+    }
+
+    const data = await generateImage(detail);
+    data.map((image) => {
+      setBase64String((oldValue) => [...oldValue, image.base64]);
+    });
+
+    setIsLoading(false);
+    setIsGenerated(true);
+  };
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className={style.page_container}>
+      <div className={style.input_container}>
+        <div className={style.hero}>
+          <h1>Design blog banners</h1>
+          <h1>with just a click</h1>
         </div>
-      </div>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+        <TextField
+          label="I am a text overlay (optional)"
+          variant="outlined"
+          onChange={(e) => useTitle(e.target.value)}
+          multiline
+          maxRows={5}
         />
+        <TextField
+          label="Description of the image"
+          variant="outlined"
+          onChange={(e) => useDetail(e.target.value)}
+          required
+          error={!isDetailEmpty}
+          helperText={!isDetailEmpty ? "Required field." : ""}
+        />
+
+        <Button
+          onClick={(e) => handleGenerate(e)}
+          variant="contained"
+          disabled={isLoading}
+        >
+          Generate
+        </Button>
+
+        <DownloadImage source={"/static/images/templates/grass.jpg"} />
       </div>
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
+      <div className={style.image_container} >
+        {isGenerated ? (
+          base64String.map((base64, index) => (
+            <canvas key={index} >
+              <Image
+                src={`data:image/png;base64,${base64}`}
+                alt="Generated Image"
+                width={500}
+                height={500}
+                priority
+                ref={imageRef}
+              />
+              <DownloadImage source={`data:image/png;base64,${base64}`} />
+            </canvas>
+          ))
+        ) : (
+          <div>
+            {isLoading ? (
+              <CircularProgress />
+            ) : (
+              <div>
+                <canvas ref={canvasRef} width={500} height={500} />
+                <Image
+                  src="/static/images/templates/grass.jpg"
+                  alt="Sample image"
+                  width={500}
+                  height={500}
+                  priority
+                  className={style.image}
+                  ref={imageRef}
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+                />
+              </div>
+            )}
+          </div>
+        )}
+        {/* {title && <Draggable content={title} />} */}
       </div>
-    </main>
+    </div>
   );
 }
