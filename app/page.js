@@ -23,15 +23,14 @@ export default function Home() {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     const img = imageRef.current;
 
     if (img) {
       ctx.drawImage(img, 0, 0);
-      ctx.font = '40px Roboto';
+      ctx.font = "40px Roboto";
       ctx.fillText(title, 100, 100);
     }
-  
   }, [title]);
 
   const handleGenerate = async (e) => {
@@ -87,10 +86,11 @@ export default function Home() {
         <DownloadImage source={"/static/images/templates/grass.jpg"} />
       </div>
 
-      <div className={style.image_container} >
+      <div className={style.image_container}>
         {isGenerated ? (
           base64String.map((base64, index) => (
-            <canvas key={index} >
+            <div>
+              <canvas key={index} width={500} height={500} />
               <Image
                 src={`data:image/png;base64,${base64}`}
                 alt="Generated Image"
@@ -100,7 +100,7 @@ export default function Home() {
                 ref={imageRef}
               />
               <DownloadImage source={`data:image/png;base64,${base64}`} />
-            </canvas>
+            </div>
           ))
         ) : (
           <div>
@@ -117,7 +117,6 @@ export default function Home() {
                   priority
                   className={style.image}
                   ref={imageRef}
-
                 />
               </div>
             )}
