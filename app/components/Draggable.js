@@ -27,10 +27,10 @@ export default function Draggable({ content }) {
   );
 
   return (
-    <canvas className={style.container}>
+    <div className={style.container}>
       <div className={style.draggableItem} ref={elementRef} onMouseDown={onMouseDown}>
         {content}
       </div>
-    </canvas>
+    </div>
   );
 };
