@@ -1,27 +1,44 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from "react";
+import Script from "next/script";
 
-const DraggableTextCanvas = ({ text, color, fontSize }) => {
+const DraggableTextCanvas = ({ text, color, fontSize, selectedFont }) => {
   const canvasRef = useRef(null);
   const [position, setPosition] = useState({ x: 50, y: 50 });
   const [dragging, setDragging] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
 
-  useEffect(() => {
+  function drawTextOnCanvas() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw the text
-    ctx.font = `${fontSize}px Arial`;
+    ctx.font = `${fontSize}px ${selectedFont}`;
     ctx.fillStyle = color;
 
     const lines = text.split("\n");
     lines.forEach((line, index) => {
       ctx.fillText(line, position.x, position.y + index * 50);
     });
-  }, [text, position, color, fontSize]);
+  }
+
+  useEffect(() => {
+    if (!selectedFont) return;
+
+    const WebFontLoader = require("webfontloader");
+    WebFontLoader.load({
+      google: {
+        families: [selectedFont],
+      },
+      fontactive: function (familyName, fvd) {
+        // This function is called once the font is loaded and active
+        // console.log(`${familyName} is active`);
+        drawTextOnCanvas();
+      },
+    });
+  }, [text, position, color, fontSize, selectedFont]);
 
   const handleMouseDown = (e) => {
     const canvas = canvasRef.current;
@@ -30,7 +47,6 @@ const DraggableTextCanvas = ({ text, color, fontSize }) => {
     const mouseY = e.clientY - rect.top;
 
     const ctx = canvas.getContext("2d");
-    ctx.font = `${fontSize}px Arial`;
     const lines = text.split("\n");
     const textWidth = Math.max(
       ...lines.map((line) => ctx.measureText(line).width)
@@ -65,6 +81,10 @@ const DraggableTextCanvas = ({ text, color, fontSize }) => {
 
   return (
     <div>
+      <Script
+        src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"
+        onLoad={() => console.log("WebFontLoader script loaded")}
+      />
       <canvas
         ref={canvasRef}
         width={500}
@@ -75,6 +95,7 @@ const DraggableTextCanvas = ({ text, color, fontSize }) => {
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       />
+      <p style={{ fontFamily: selectedFont }}>Hello World</p>
     </div>
   );
 };

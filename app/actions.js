@@ -47,3 +47,12 @@ export async function generateImage(detail) {
 
   return generatedImages;
 }
+
+// FETCH FONT FROM GOOGLE
+export async function getFontFamilies() {
+  const apiKey = process.env.GOOGLE_API_KEY; // Ensure your API key is stored in .env.local
+  const response = await fetch(`https://www.googleapis.com/webfonts/v1/webfonts?key=${apiKey}&sort=popularity`);
+  const data = await response.json();
+  const fontFamilies = data.items.map(font => font.family);
+  return fontFamilies;
+}

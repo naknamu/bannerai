@@ -7,13 +7,12 @@ import style from "./page.module.css";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import CircularProgress from "@mui/material/CircularProgress";
-import Draggable from "./components/Draggable";
 import DownloadImage from "./components/DownloadImage";
-import { HexColorPicker, HexColorInput } from "react-colorful";
 import Stack from "@mui/material/Stack";
 import Link from "next/link";
 import DraggableTextCanvas from "./components/DraggableTextCanvas";
 import { ColorPicker } from "./components/ColorPicker";
+import FontPicker from "./components/FontPicker";
 
 export default function Home() {
   const [title, setTitle] = useState("I am a text overlay");
@@ -23,7 +22,8 @@ export default function Home() {
   const [isDetailEmpty, setIsDetailEmpty] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [color, setColor] = useState("#000");
-  const [fontSize, setFontSize] = useState("42");
+  const [fontSize, setFontSize] = useState(42);
+  const [selectedFont, setSelectedFont] = useState("");
 
   const handleGenerate = async (e) => {
     e.preventDefault();
@@ -60,9 +60,18 @@ export default function Home() {
           maxRows={5}
         />
 
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={3}>
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={3}
+          alignItems="center"
+          justifyContent="center"
+        >
           <h4>Font Style: </h4>
           <ColorPicker color={color} onChange={setColor} />
+          <FontPicker
+            selectedFont={selectedFont}
+            setSelectedFont={setSelectedFont}
+          />
           <TextField
             label="font size (px)"
             variant="standard"
@@ -106,6 +115,7 @@ export default function Home() {
                   text={title}
                   color={color}
                   fontSize={fontSize}
+                  selectedFont={selectedFont}
                 />
                 <Button
                   onClick={(e) => handleGenerate(e)}
