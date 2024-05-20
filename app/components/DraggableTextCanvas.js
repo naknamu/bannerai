@@ -27,18 +27,20 @@ const DraggableTextCanvas = ({ text, color, fontSize, selectedFont }) => {
   useEffect(() => {
     if (!selectedFont) return;
 
-    const WebFontLoader = require("webfontloader");
-    WebFontLoader.load({
-      google: {
-        families: [selectedFont],
-      },
-      fontactive: function (familyName, fvd) {
-        // This function is called once the font is loaded and active
-        // console.log(`${familyName} is active`);
-        drawTextOnCanvas();
-      },
-    });
-  }, [text, position, color, fontSize, selectedFont]);
+    const loadFont = async () => {
+      const WebFontLoader = await import("webfontloader");
+      WebFontLoader.load({
+        google: {
+          families: [selectedFont],
+        },
+        fontactive: (familyName, fvd) => {
+          drawTextOnCanvas();
+        },
+      });
+    };
+
+    loadFont();
+  }, [selectedFont, drawTextOnCanvas]);
 
   const handleMouseDown = (e) => {
     const canvas = canvasRef.current;
@@ -95,7 +97,7 @@ const DraggableTextCanvas = ({ text, color, fontSize, selectedFont }) => {
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       />
-      <p style={{ fontFamily: selectedFont }}>Hello World</p>
+      {/* <p style={{ fontFamily: selectedFont }}>Hello World</p> */}
     </div>
   );
 };

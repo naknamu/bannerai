@@ -28,7 +28,7 @@ const FontPicker = ({ selectedFont, setSelectedFont }) => {
           value={selectedFont}
           label="Font Family"
           onChange={(e) => setSelectedFont(e.target.value)}
-          style={{ fontFamily: selectedFont }}
+          // style={{ fontFamily: selectedFont }}
         >
           {fonts.map((font) => (
             <option key={font} value={font} style={{ fontFamily: font }}>

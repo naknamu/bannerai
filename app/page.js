@@ -13,6 +13,7 @@ import Link from "next/link";
 import DraggableTextCanvas from "./components/DraggableTextCanvas";
 import { ColorPicker } from "./components/ColorPicker";
 import FontPicker from "./components/FontPicker";
+import Tooltip from '@mui/material/Tooltip';
 
 export default function Home() {
   const [title, setTitle] = useState("I am a text overlay");
@@ -117,6 +118,7 @@ export default function Home() {
                   fontSize={fontSize}
                   selectedFont={selectedFont}
                 />
+                <Tooltip title="Generate background image">
                 <Button
                   onClick={(e) => handleGenerate(e)}
                   variant="contained"
@@ -124,6 +126,7 @@ export default function Home() {
                 >
                   Generate
                 </Button>
+                </Tooltip>
               </div>
             )}
           </div>
