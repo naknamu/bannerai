@@ -23,16 +23,15 @@
 
 .image_container {
   position: relative;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 .image_container .image {
   display: none;
   width: 100%;
   height: auto;
-}
-
-.hoveredColor {
-  width: 100px;
-  height: 100px;
 }

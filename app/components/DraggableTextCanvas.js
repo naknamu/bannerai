@@ -3,7 +3,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import Script from "next/script";
 
-const DraggableTextCanvas = ({ text, color, fontSize, selectedFont }) => {
+const DraggableTextCanvas = ({ text, color, fontSize, selectedFont, boldText, italicText }) => {
   const canvasRef = useRef(null);
   const [position, setPosition] = useState({ x: 50, y: 50 });
   const [dragging, setDragging] = useState(false);
@@ -15,7 +15,7 @@ const DraggableTextCanvas = ({ text, color, fontSize, selectedFont }) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw the text
-    ctx.font = `${fontSize}px ${selectedFont}`;
+    ctx.font = `${boldText} ${italicText} ${fontSize}px ${selectedFont}`;
     ctx.fillStyle = color;
 
     const lines = text.split("\n");
