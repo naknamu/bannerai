@@ -1,13 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import { generateImage } from "./actions";
 import style from "./page.module.css";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import CircularProgress from "@mui/material/CircularProgress";
-import DownloadImage from "./components/DownloadImage";
 import Link from "next/link";
 import DraggableTextCanvas from "./components/DraggableTextCanvas";
 import Tooltip from "@mui/material/Tooltip";
@@ -16,11 +14,11 @@ import FontStyles from "./components/FontStyles";
 export default function Home() {
   const [title, setTitle] = useState("I am a text overlay");
   const [detail, setDetail] = useState("");
-  const [base64String, setBase64String] = useState([]);
-  const [isGenerated, setIsGenerated] = useState(false);
+  const [base64String, setBase64String] = useState(["test"]);
+  const [isGenerated, setIsGenerated] = useState(true);
   const [isDetailEmpty, setIsDetailEmpty] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [color, setColor] = useState("#808080");
+  const [color, setColor] = useState("#fff");
   const [fontSize, setFontSize] = useState(42);
   const [selectedFont, setSelectedFont] = useState("");
   const [boldText, setBoldText] = useState("");
@@ -81,6 +79,7 @@ export default function Home() {
         </Tooltip>
       </div>
 
+      {isGenerated ? (
       <div className={style.image_container}>
         <FontStyles
           color={color}
@@ -92,39 +91,21 @@ export default function Home() {
           setBoldText={setBoldText}
           setItalicText={setItalicText}
         />
-
-        {isGenerated ? (
-          base64String.map((base64, index) => (
-            <div>
-              <Image
-                src={`data:image/png;base64,${base64}`}
-                alt="Generated Image"
-                width={500}
-                height={500}
-                priority
-              />
-              <DownloadImage source={`data:image/png;base64,${base64}`} />
-            </div>
-          ))
-        ) : (
-          <div>
-            {isLoading ? (
-              <CircularProgress />
-            ) : (
-              <div>
-                <DraggableTextCanvas
-                  text={title}
-                  color={color}
-                  fontSize={fontSize}
-                  selectedFont={selectedFont}
-                  boldText={boldText}
-                  italicText={italicText}
-                />
-              </div>
-            )}
+        {base64String.map((base64, index) => (
+          <div key={index}>
+            <DraggableTextCanvas
+              text={title}
+              color={color}
+              fontSize={fontSize}
+              selectedFont={selectedFont}
+              boldText={boldText}
+              italicText={italicText}
+              // imgSource={`data:image/png;base64,${base64}`}
+              imgSource={'/static/images/templates/grass.jpg'}
+            />
           </div>
-        )}
-      </div>
+        ))}
+      </div>) : (isLoading ? <CircularProgress /> : "" )}
     </div>
   );
 }

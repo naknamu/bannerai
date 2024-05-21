@@ -1,68 +1,46 @@
-"use client";
+"use client"
 
-import React, { useState, useEffect } from "react";
-import { getFontFamilies } from "../actions";
-import Script from "next/script";
+import React, { useEffect, useRef } from 'react';
 
-const FontPicker = () => {
-  const [fonts, setFonts] = useState([]);
-  const [selectedFont, setSelectedFont] = useState("");
+function CanvasComponent() {
+    const canvasRef = useRef(null);
 
-  console.log(selectedFont);
+    useEffect(() => {
+      drawOnCanvas()
+    }, [])
 
-  useEffect(() => {
-    const fetchFonts = async () => {
-      try {
-        const fontFamilies = await getFontFamilies();
-        setFonts(fontFamilies);
-        setSelectedFont(fontFamilies[0]); // Set initial font to the first one in the list
-      } catch (error) {
-        console.error("Error fetching fonts:", error);
-      }
+    // Function to draw on the canvas
+    const drawOnCanvas = () => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = 'red';
+        ctx.fillRect(50, 50, 100, 100);
     };
 
-    fetchFonts();
-  }, []);
-
-  useEffect(() => {
-    if (!selectedFont) return;
-
-    const loadFont = () => {
-      if (window.WebFont) {
-        window.WebFont.load({
-          google: {
-            families: [selectedFont],
-          },
-        });
-      }
+    // Function to handle the download button click
+    const handleDownload = () => {
+        const canvas = canvasRef.current;
+        const link = document.createElement('a');
+        link.download = 'banner.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
     };
 
-    loadFont();
-  }, [selectedFont]);
+    // Function to clear the canvas
+    const clearCanvas = () => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    };
 
+    return (
+        <div>
+            <canvas ref={canvasRef} width={400} height={400} style={{ border: '1px solid #000000' }}></canvas>
+            <br />
+            <button onClick={handleDownload}>Download Image</button>
+            <button onClick={clearCanvas}>Clear Canvas</button>
+        </div>
+    );
+}
 
-  return (
-    <div>
-      <Script
-        src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"
-        onLoad={() => console.log('WebFontLoader script loaded')}
-      />
-      <h1>Font Picker</h1>
-      <select
-        value={selectedFont}
-        onChange={(e) => setSelectedFont(e.target.value)}
-      >
-        {fonts.map((font) => (
-          <option key={font} value={font} style={{ fontFamily: font }}>
-            {font}
-          </option>
-        ))}
-      </select>
-      <p style={{ fontFamily: selectedFont, fontSize: "24px" }}>
-        The quick brown fox jumps over the lazy dog.
-      </p>
-    </div>
-  );
-};
-
-export default FontPicker;
+export default CanvasComponent;
