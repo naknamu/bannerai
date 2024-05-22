@@ -4,7 +4,7 @@ const engineId = "stable-diffusion-v1-6";
 const apiHost = process.env.API_HOST ?? "https://api.stability.ai";
 const apiKey = process.env.STABILITY_API_KEY;
 
-export async function generateImage(detail) {
+export async function generateImage(detail, size) {
   if (!apiKey) throw new Error("Missing Stability API key.");
 
   const response = await fetch(
@@ -23,8 +23,8 @@ export async function generateImage(detail) {
           },
         ],
         cfg_scale: 7,
-        height: 1024,
-        width: 1024,
+        height: size.w,
+        width: size.h,
         steps: 30,
         samples: 1,
       }),

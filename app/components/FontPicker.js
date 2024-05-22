@@ -22,7 +22,7 @@ const FontPicker = ({ selectedFont, setSelectedFont }) => {
 
   return (
     <div>
-      <FormControl variant="standard" sx={{ m: 1, minWidth: 180 }}>
+      <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
         <InputLabel id="font-family-select">Font Family</InputLabel>
         <NativeSelect
           value={selectedFont}

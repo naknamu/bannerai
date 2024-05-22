@@ -39,7 +39,7 @@ export default function FontStyles({
     <div>
       <Stack
         direction={{ xs: "column", sm: "row" }}
-        spacing={3}
+        spacing={2}
         alignItems="center"
         justifyContent="center"
       >

@@ -2,10 +2,9 @@
 
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import Script from "next/script";
-import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 
-const DraggableTextCanvas = ({
+const Canvas = ({
   text,
   color,
   fontSize,
@@ -13,47 +12,95 @@ const DraggableTextCanvas = ({
   boldText,
   italicText,
   imgSource,
+  size,
+  displaySize,
+  offscreenCanvasRef,
 }) => {
   const canvasRef = useRef(null);
-  const offscreenCanvasRef = useRef(null);
   const imgRef = useRef(null);
-  const [position, setPosition] = useState({ x: 200, y: 200 });
+  const [position, setPosition] = useState({ x: 100, y: 512 });
   const [dragging, setDragging] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [showLine, setShowLine] = useState(false);
 
   const drawTextOnCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(offscreenCanvasRef.current, 0, 0);
+    ctx.drawImage(
+      offscreenCanvasRef.current,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+    // Draw the line if the flag is true
+    if (showLine) {
+      ctx.strokeStyle = "purple";
+      ctx.lineWidth = 2;
+      // Draw horizontal line
+      ctx.beginPath();
+      ctx.moveTo(0, canvas.height / 2);
+      ctx.lineTo(canvas.width, canvas.height / 2);
+      ctx.stroke();
+      // Draw vertical line
+      ctx.beginPath();
+      ctx.moveTo(canvas.width / 2, 0);
+      ctx.lineTo(canvas.width / 2, canvas.height);
+      ctx.stroke();
+    }
 
     ctx.font = `${boldText} ${italicText} ${fontSize}px ${selectedFont}`;
     ctx.fillStyle = color;
 
     const lines = text.split("\n");
+    const lineHeight = fontSize * 1.2; // Adjust the line height as needed
+
     lines.forEach((line, index) => {
-      ctx.fillText(line, position.x, position.y + index * 50);
+      ctx.fillText(line, position.x, position.y + index * lineHeight);
     });
-  }, [boldText, italicText, fontSize, selectedFont, color, text, position]);
+  }, [
+    boldText,
+    italicText,
+    fontSize,
+    selectedFont,
+    color,
+    text,
+    position,
+    showLine,
+  ]);
 
   const drawImageOnOffscreenCanvas = useCallback(() => {
     const offscreenCanvas = offscreenCanvasRef.current;
     const offscreenCtx = offscreenCanvas.getContext("2d");
 
-    offscreenCanvas.width = 600;
-    offscreenCanvas.height = 400;
+    offscreenCanvas.width = size.w;
+    offscreenCanvas.height = size.h;
 
     const img = imgRef.current;
     if (img.complete) {
-      offscreenCtx.drawImage(img, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
+      offscreenCtx.drawImage(
+        img,
+        0,
+        0,
+        offscreenCanvas.width,
+        offscreenCanvas.height
+      );
       drawTextOnCanvas();
     } else {
       img.onload = () => {
-        offscreenCtx.drawImage(img, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
+        offscreenCtx.drawImage(
+          img,
+          0,
+          0,
+          offscreenCanvas.width,
+          offscreenCanvas.height
+        );
         drawTextOnCanvas();
       };
     }
-  }, [drawTextOnCanvas]);
+  }, [size, drawTextOnCanvas]);
 
   useEffect(() => {
     if (typeof window === "undefined" || !selectedFont) return;
@@ -84,13 +131,17 @@ const DraggableTextCanvas = ({
   const handleMouseDown = (e) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const mouseX = (e.clientX - rect.left) * scaleX;
+    const mouseY = (e.clientY - rect.top) * scaleY;
 
     const ctx = canvas.getContext("2d");
     const lines = text.split("\n");
-    const textWidth = Math.max(...lines.map((line) => ctx.measureText(line).width));
-    const textHeight = fontSize * lines.length;
+    const textWidth = Math.max(
+      ...lines.map((line) => ctx.measureText(line).width)
+    );
+    const textHeight = fontSize * lines.length * 1.2; // Adjust the line height as needed
 
     if (
       mouseX >= position.x &&
@@ -107,11 +158,26 @@ const DraggableTextCanvas = ({
     if (dragging) {
       const canvas = canvasRef.current;
       const rect = canvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const mouseX = (e.clientX - rect.left) * scaleX;
+      const mouseY = (e.clientY - rect.top) * scaleY;
+
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const threshold = 10; // Pixels within which to show the red line
 
       requestAnimationFrame(() => {
-        setPosition({ x: mouseX - offset.x, y: mouseY - offset.y });
+        const newPosition = { x: mouseX - offset.x, y: mouseY - offset.y };
+        setPosition(newPosition);
+
+        if (
+          Math.abs(newPosition.x - centerX) < threshold ||
+          Math.abs(newPosition.y - centerY) < threshold
+        ) {
+          setShowLine(true);
+        }
+
         drawTextOnCanvas();
       });
     }
@@ -119,30 +185,8 @@ const DraggableTextCanvas = ({
 
   const handleMouseUp = () => {
     setDragging(false);
-  };
-
-  const handleDownload = () => {
-    const canvas = canvasRef.current;
-
-    const newCanvas = document.createElement("canvas");
-    newCanvas.width = 600;
-    newCanvas.height = 400;
-    const newCtx = newCanvas.getContext("2d");
-
-    newCtx.drawImage(offscreenCanvasRef.current, 0, 0);
-
-    // Draw the text scaled to the new resolution
-    newCtx.font = `${boldText} ${italicText} ${fontSize}px ${selectedFont}`;
-    newCtx.fillStyle = color;
-    const lines = text.split("\n");
-    lines.forEach((line, index) => {
-      newCtx.fillText(line, position.x, (position.y + index * 50));
-    });
-
-    const link = document.createElement("a");
-    link.download = `banner_${newCanvas.width}x${newCanvas.height}.png`;
-    link.href = newCanvas.toDataURL("image/png");
-    link.click();
+    setShowLine(false); // Remove the line when dragging stops
+    drawTextOnCanvas();
   };
 
   return (
@@ -154,21 +198,22 @@ const DraggableTextCanvas = ({
       <Stack spacing={2}>
         <canvas
           ref={canvasRef}
-          width={600}
-          height={400}
-          style={{ border: "1px solid black" }}
+          width={size.w}
+          height={size.h}
+          style={{
+            border: "1px solid black",
+            width: displaySize.w,
+            height: displaySize.h,
+          }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
         />
-        <Button onClick={handleDownload} variant="contained">
-          Download
-        </Button>
       </Stack>
       <canvas ref={offscreenCanvasRef} style={{ display: "none" }} />
     </div>
   );
 };
 
-export default DraggableTextCanvas;
+export default Canvas;
