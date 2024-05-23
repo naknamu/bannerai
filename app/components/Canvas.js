@@ -15,10 +15,11 @@ const Canvas = ({
   size,
   displaySize,
   offscreenCanvasRef,
+  position,
+  setPosition,
 }) => {
   const canvasRef = useRef(null);
   const imgRef = useRef(null);
-  const [position, setPosition] = useState({ x: 100, y: 512 });
   const [dragging, setDragging] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [showLine, setShowLine] = useState(false);
@@ -201,7 +202,7 @@ const Canvas = ({
           width={size.w}
           height={size.h}
           style={{
-            border: "1px solid black",
+            // border: "1px solid black",
             width: displaySize.w,
             height: displaySize.h,
           }}

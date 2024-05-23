@@ -14,34 +14,31 @@ import ImageSizes from "./components/ImageSizes";
 import Download from "./components/Download";
 
 const IMAGE_SIZES = [
-  // { w: 600, h: 400 },
-  // { w: 1200, h: 800 },
-  // { w: 940, h: 788 },
   { w: 1024, h: 1024 },
+  { w: 1536, h: 640 },
   { w: 1152, h: 896 },
   { w: 896, h: 1152 },
   { w: 1216, h: 832 },
   { w: 1344, h: 768 },
   // { w: 768, h: 1344 },
-  { w: 1536, h: 640 },
   // { w: 640, h: 1536 },
 ];
 
 export default function Home() {
-  const [title, setTitle] = useState("I am a text overlay");
+  const [title, setTitle] = useState("sunset by the seashore");
   const [detail, setDetail] = useState("");
-  const [base64String, setBase64String] = useState(["test"]);
-  const [isGenerated, setIsGenerated] = useState(true);
-  // const [base64String, setBase64String] = useState([]);
-  // const [isGenerated, setIsGenerated] = useState(false);
+  const [base64String, setBase64String] = useState("");
+  // const [isGenerated, setIsGenerated] = useState(true);
+  const [isGenerated, setIsGenerated] = useState(false);
   const [isDetailEmpty, setIsDetailEmpty] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [color, setColor] = useState("#000");
+  const [color, setColor] = useState("#fff");
   const [fontSize, setFontSize] = useState(75);
   const [selectedFont, setSelectedFont] = useState("");
   const [boldText, setBoldText] = useState("");
   const [italicText, setItalicText] = useState("");
   const offscreenCanvasRef = useRef(null);
+  const [position, setPosition] = useState({ x: 30, y: 90 });
 
   const [size, setSize] = useState(IMAGE_SIZES[0]);
   const [displaySize, setDisplaySize] = useState({
@@ -59,8 +56,9 @@ export default function Home() {
     }
 
     const data = await generateImage(detail, size);
+
     data.map((image) => {
-      setBase64String((oldValue) => [...oldValue, image.base64]);
+      setBase64String(image.base64);
     });
 
     setIsLoading(false);
@@ -71,8 +69,8 @@ export default function Home() {
     <div className={style.page_container}>
       <div className={style.input_container}>
         <div className={style.hero}>
-          <h1>Design blog banners</h1>
-          <h1>with just a click</h1>
+          <h1>Create Beautiful Graphics</h1>
+          <h1>In One Click!</h1>
           {/* <Link href="/sandbox">Sandbox</Link> */}
         </div>
 
@@ -91,9 +89,11 @@ export default function Home() {
           required
           error={!isDetailEmpty}
           helperText={!isDetailEmpty ? "Required field." : ""}
+          multiline
+          maxRows={5}
         />
 
-        <Tooltip title="Generate background image">
+        <Tooltip title="Click to generate">
           <Button
             onClick={(e) => handleGenerate(e)}
             variant="contained"
@@ -128,37 +128,36 @@ export default function Home() {
               boldText={boldText}
               italicText={italicText}
               selectedFont={selectedFont}
+              color={color}
+              text={title}
+              position={position}
             />
           </>
         )}
       </div>
 
-      {isGenerated ? (
+      {isGenerated && (
         <div className={style.canvas_container}>
-          {base64String.map((base64, index) => (
-            <div key={index}>
-              <Canvas
-                text={title}
-                color={color}
-                fontSize={fontSize}
-                selectedFont={selectedFont}
-                boldText={boldText}
-                italicText={italicText}
-                // imgSource={`data:image/png;base64,${base64}`}
-                imgSource={"/static/images/templates/grass.jpg"}
-                size={size}
-                displaySize={displaySize}
-                IMAGE_SIZES={IMAGE_SIZES}
-                offscreenCanvasRef={offscreenCanvasRef}
-              />
-            </div>
-          ))}
+          <Canvas
+            text={title}
+            color={color}
+            fontSize={fontSize}
+            selectedFont={selectedFont}
+            boldText={boldText}
+            italicText={italicText}
+            imgSource={`data:image/png;base64,${base64String}`}
+            // imgSource={"/static/images/templates/grass.jpg"}
+            size={size}
+            displaySize={displaySize}
+            IMAGE_SIZES={IMAGE_SIZES}
+            offscreenCanvasRef={offscreenCanvasRef}
+            position={position}
+            setPosition={setPosition}
+          />
         </div>
-      ) : isLoading ? (
-        <CircularProgress />
-      ) : (
-        ""
       )}
+
+      {isLoading && <CircularProgress />}
     </div>
   );
 }

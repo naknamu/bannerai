@@ -1,12 +1,15 @@
 import Button from "@mui/material/Button";
 
 export default function Download({
+  text,
+  color,
   size,
   offscreenCanvasRef,
   fontSize,
   boldText,
   italicText,
   selectedFont,
+  position
 }) {
   const handleDownload = () => {
     const newCanvas = document.createElement("canvas");
