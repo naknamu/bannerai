@@ -2,7 +2,6 @@
 
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import Script from "next/script";
-import Stack from "@mui/material/Stack";
 
 const Canvas = ({
   text,
@@ -191,29 +190,27 @@ const Canvas = ({
   };
 
   return (
-    <div>
+    <>
       <Script
         src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"
         onLoad={() => console.log("WebFontLoader script loaded")}
       />
-      <Stack spacing={2}>
-        <canvas
-          ref={canvasRef}
-          width={size.w}
-          height={size.h}
-          style={{
-            // border: "1px solid black",
-            width: displaySize.w,
-            height: displaySize.h,
-          }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-        />
-      </Stack>
+      <canvas
+        ref={canvasRef}
+        width={size.w}
+        height={size.h}
+        style={{
+          // border: "1px solid black",
+          width: displaySize.w,
+          height: displaySize.h,
+        }}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      />
       <canvas ref={offscreenCanvasRef} style={{ display: "none" }} />
-    </div>
+    </>
   );
 };
 

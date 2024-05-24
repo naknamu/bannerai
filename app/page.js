@@ -32,8 +32,8 @@ export default function Home() {
   const [title, setTitle] = useState("sunset by the seashore");
   const [detail, setDetail] = useState("");
   const [base64String, setBase64String] = useState("");
-  // const [isGenerated, setIsGenerated] = useState(true);
-  const [isGenerated, setIsGenerated] = useState(false);
+  const [isGenerated, setIsGenerated] = useState(true);
+  // const [isGenerated, setIsGenerated] = useState(false);
   const [isDetailEmpty, setIsDetailEmpty] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [color, setColor] = useState("#fff");
@@ -130,8 +130,7 @@ export default function Home() {
         />
 
         <Tooltip title={!isLimit ? "Click to generate": "Limit reached, try again tomorrow."}>
-          <span>
-            {" "}
+          <>
             <Button
               onClick={(e) => handleGenerate(e)}
               variant="contained"
@@ -139,7 +138,7 @@ export default function Home() {
             >
               Generate
             </Button>
-          </span>
+          </>
         </Tooltip>
 
         {isGenerated && (
@@ -184,8 +183,8 @@ export default function Home() {
             selectedFont={selectedFont}
             boldText={boldText}
             italicText={italicText}
-            imgSource={`data:image/png;base64,${base64String}`}
-            // imgSource={"/static/images/templates/grass.jpg"}
+            // imgSource={`data:image/png;base64,${base64String}`}
+            imgSource={"/static/images/templates/grass.jpg"}
             size={size}
             displaySize={displaySize}
             IMAGE_SIZES={IMAGE_SIZES}

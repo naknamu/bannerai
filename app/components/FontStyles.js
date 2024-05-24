@@ -36,9 +36,9 @@ export default function FontStyles({
   };
 
   return (
-    <div>
+    <>
       <Stack
-        direction={{ xs: "column", sm: "row" }}
+        direction="row"
         spacing={2}
         alignItems="center"
         justifyContent="center"
@@ -95,6 +95,6 @@ export default function FontStyles({
           </Box>
         </Tooltip>
       </Stack>
-    </div>
+    </>
   );
 }
