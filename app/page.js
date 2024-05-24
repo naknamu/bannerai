@@ -32,8 +32,8 @@ export default function Home() {
   const [title, setTitle] = useState("sunset by the seashore");
   const [detail, setDetail] = useState("");
   const [base64String, setBase64String] = useState("");
-  const [isGenerated, setIsGenerated] = useState(true);
-  // const [isGenerated, setIsGenerated] = useState(false);
+  // const [isGenerated, setIsGenerated] = useState(true);
+  const [isGenerated, setIsGenerated] = useState(false);
   const [isDetailEmpty, setIsDetailEmpty] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [color, setColor] = useState("#fff");
@@ -84,13 +84,13 @@ export default function Home() {
     // Call this function before generating an image
     if (incrementGenerationCount()) {
       // Proceed with image generation
-      // const data = await generateImage(detail, size);
+      const data = await generateImage(detail, size);
 
-      // data.map((image) => {
-      //   setBase64String(image.base64);
-      // });
+      data.map((image) => {
+        setBase64String(image.base64);
+      });
 
-      // setIsGenerated(true);
+      setIsGenerated(true);
       setIsLimit(false);
     } else {
       // Inform the user they have reached the limit
@@ -105,8 +105,13 @@ export default function Home() {
     <div className={style.page_container}>
       <div className={style.input_container}>
         <div className={style.hero}>
-          <h1>Create <span style={{color: "var(--accent)"}}>Beautiful</span> Graphics</h1>
-          <h1>in <span className={style.wavy_underline}>One Click</span></h1>
+          <h1>
+            Create <span style={{ color: "var(--accent)" }}>Beautiful</span>{" "}
+            Graphics
+          </h1>
+          <h1>
+            in <span className={style.wavy_underline}>One Click</span>
+          </h1>
           {/* <Link href="/sandbox">Sandbox</Link> */}
         </div>
 
@@ -129,16 +134,14 @@ export default function Home() {
           maxRows={5}
         />
 
-        <Tooltip title={!isLimit ? "Click to generate": "Limit reached, try again tomorrow."}>
-          <>
-            <Button
-              onClick={(e) => handleGenerate(e)}
-              variant="contained"
-              disabled={isLoading || isLimit}
-            >
-              Generate
-            </Button>
-          </>
+        <Tooltip title={!isLimit ? "Click to generate" : ""}>
+          <Button
+            onClick={(e) => handleGenerate(e)}
+            variant="contained"
+            disabled={isLoading || isLimit}
+          >
+            Generate
+          </Button>
         </Tooltip>
 
         {isGenerated && (
@@ -183,8 +186,8 @@ export default function Home() {
             selectedFont={selectedFont}
             boldText={boldText}
             italicText={italicText}
-            // imgSource={`data:image/png;base64,${base64String}`}
-            imgSource={"/static/images/templates/grass.jpg"}
+            imgSource={`data:image/png;base64,${base64String}`}
+            // imgSource={"/static/images/templates/grass.jpg"}
             size={size}
             displaySize={displaySize}
             IMAGE_SIZES={IMAGE_SIZES}

@@ -6,4 +6,20 @@
 
 :root {
   --accent: #FD5E53;
+  --dark: #333;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-style: wavy;
+}
+
+h1 , h4 {
+  color: var(--dark);
 }

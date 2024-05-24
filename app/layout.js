@@ -1,6 +1,7 @@
 import { Inter, Patua_One } from "next/font/google";
 import "./globals.css";
-// import Navbar from "./components/Navbar";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 const patua_one = Patua_One({ subsets: ["latin"], weight: "400" });
@@ -14,8 +15,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={patua_one.className}>
-        {/* <Navbar /> */}
+        <Navbar />
         {children}
+        <Footer />
       </body>
     </html>
   );
