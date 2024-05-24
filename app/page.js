@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { generateImage } from "./actions";
 import style from "./page.module.css";
 import Button from "@mui/material/Button";
@@ -12,6 +12,8 @@ import Tooltip from "@mui/material/Tooltip";
 import FontStyles from "./components/FontStyles";
 import ImageSizes from "./components/ImageSizes";
 import Download from "./components/Download";
+import { setCookie, getCookie } from "cookies-next";
+import { useRouter } from "next/navigation";
 
 const IMAGE_SIZES = [
   { w: 1024, h: 1024 },
@@ -23,6 +25,8 @@ const IMAGE_SIZES = [
   // { w: 768, h: 1344 },
   // { w: 640, h: 1536 },
 ];
+
+const GENERATION_LIMIT = 10;
 
 export default function Home() {
   const [title, setTitle] = useState("sunset by the seashore");
@@ -39,12 +43,34 @@ export default function Home() {
   const [italicText, setItalicText] = useState("");
   const offscreenCanvasRef = useRef(null);
   const [position, setPosition] = useState({ x: 30, y: 90 });
-
   const [size, setSize] = useState(IMAGE_SIZES[0]);
   const [displaySize, setDisplaySize] = useState({
     w: IMAGE_SIZES[0].w / 2,
     h: IMAGE_SIZES[0].h / 2,
   });
+  const router = useRouter();
+  const [isLimit, setIsLimit] = useState(false);
+
+  useEffect(() => {
+    if (parseInt(getCookie("generationCount")) > GENERATION_LIMIT) {
+      setIsLimit(true);
+    }
+  }, []);
+
+  // function to limit the number of generation
+  function incrementGenerationCount() {
+    let count = parseInt(getCookie("generationCount")) || 0;
+    count++;
+    setCookie("generationCount", count, { maxAge: 20 });
+    router.refresh();
+
+    // Limit to 10 generations
+    if (count > GENERATION_LIMIT) {
+      alert("Generation limit reached");
+      return false; // Prevent further generations
+    }
+    return true; // Allow generation
+  }
 
   const handleGenerate = async (e) => {
     e.preventDefault();
@@ -55,14 +81,24 @@ export default function Home() {
       return;
     }
 
-    const data = await generateImage(detail, size);
+    // Call this function before generating an image
+    if (incrementGenerationCount()) {
+      // Proceed with image generation
+      // const data = await generateImage(detail, size);
 
-    data.map((image) => {
-      setBase64String(image.base64);
-    });
+      // data.map((image) => {
+      //   setBase64String(image.base64);
+      // });
+
+      // setIsGenerated(true);
+      setIsLimit(false);
+    } else {
+      // Inform the user they have reached the limit
+      setIsLimit(true);
+      setIsGenerated(false);
+    }
 
     setIsLoading(false);
-    setIsGenerated(true);
   };
 
   return (
@@ -93,14 +129,17 @@ export default function Home() {
           maxRows={5}
         />
 
-        <Tooltip title="Click to generate">
-          <Button
-            onClick={(e) => handleGenerate(e)}
-            variant="contained"
-            disabled={isLoading}
-          >
-            Generate
-          </Button>
+        <Tooltip title={!isLimit ? "Click to generate": "Limit reached, try again tomorrow."}>
+          <span>
+            {" "}
+            <Button
+              onClick={(e) => handleGenerate(e)}
+              variant="contained"
+              disabled={isLoading || isLimit}
+            >
+              Generate
+            </Button>
+          </span>
         </Tooltip>
 
         {isGenerated && (
