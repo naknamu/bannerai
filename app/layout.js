@@ -1,8 +1,9 @@
-import { Inter } from "next/font/google";
+import { Inter, Patua_One } from "next/font/google";
 import "./globals.css";
-import Navbar from "./components/Navbar";
+// import Navbar from "./components/Navbar";
 
 const inter = Inter({ subsets: ["latin"] });
+const patua_one = Patua_One({ subsets: ["latin"], weight: "400" });
 
 export const metadata = {
   title: "Create Next App",
@@ -12,7 +13,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={patua_one.className}>
         {/* <Navbar /> */}
         {children}
       </body>

@@ -21,8 +21,8 @@ const Canvas = ({
   const imgRef = useRef(null);
   const [dragging, setDragging] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [showLine, setShowLine] = useState(false);
-  const [lastDrawTime, setLastDrawTime] = useState(0);
+  const [showVerticalLine, setShowVerticalLine] = useState(false);
+  const [showHorizontalLine, setShowHorizontalLine] = useState(false);
 
   const drawTextOnCanvas = useCallback(() => {
     const canvas = canvasRef.current;
@@ -30,17 +30,21 @@ const Canvas = ({
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(offscreenCanvasRef.current, 0, 0, canvas.width, canvas.height);
 
-    if (showLine) {
+    if (showVerticalLine || showHorizontalLine) {
       ctx.strokeStyle = "purple";
       ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(0, canvas.height / 2);
-      ctx.lineTo(canvas.width, canvas.height / 2);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(canvas.width / 2, 0);
-      ctx.lineTo(canvas.width / 2, canvas.height);
-      ctx.stroke();
+      if (showVerticalLine) {
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, 0);
+        ctx.lineTo(canvas.width / 2, canvas.height);
+        ctx.stroke();
+      }
+      if (showHorizontalLine) {
+        ctx.beginPath();
+        ctx.moveTo(0, canvas.height / 2);
+        ctx.lineTo(canvas.width, canvas.height / 2);
+        ctx.stroke();
+      }
     }
 
     ctx.font = `${boldText} ${italicText} ${fontSize}px ${selectedFont}`;
@@ -54,7 +58,7 @@ const Canvas = ({
       ctx.fillText(line, position.x, position.y + index * lineHeight);
     });
     ctx.restore();
-  }, [boldText, italicText, fontSize, selectedFont, color, text, position, showLine]);
+  }, [boldText, italicText, fontSize, selectedFont, color, text, position, showVerticalLine, showHorizontalLine]);
 
   const drawImageOnOffscreenCanvas = useCallback(() => {
     const offscreenCanvas = offscreenCanvasRef.current;
@@ -143,37 +147,37 @@ const Canvas = ({
       const centerY = canvas.height / 2;
       const threshold = fontSize;
 
-      requestAnimationFrame(() => {
-        const currentTime = Date.now();
-        if (currentTime - lastDrawTime > 16) {
-          setLastDrawTime(currentTime);
+      const newPosition = { x: mouseX - offset.x, y: mouseY - offset.y };
+      setPosition(newPosition);
 
-          const newPosition = { x: mouseX - offset.x, y: mouseY - offset.y };
-          setPosition(newPosition);
+      const ctx = canvas.getContext("2d");
+      const lines = text.split("\n");
+      const textWidth = Math.max(...lines.map((line) => ctx.measureText(line).width));
+      const textHeight = fontSize * lines.length * 1.2;
 
-          if (
-            Math.abs(newPosition.x - centerX) < threshold ||
-            Math.abs(newPosition.y - centerY) < threshold
-          ) {
-            setShowLine(true);
-          } else {
-            setShowLine(false);
-          }
+      const nearVerticalCenter =
+        (newPosition.x <= centerX && newPosition.x + textWidth >= centerX);
+      const nearHorizontalCenter =
+        (newPosition.y - fontSize <= centerY && newPosition.y + textHeight - fontSize >= centerY);
 
-          drawTextOnCanvas();
-        }
-      });
+      setShowVerticalLine(nearVerticalCenter);
+      setShowHorizontalLine(nearHorizontalCenter);
+
+      drawTextOnCanvas();
     }
   };
 
+  const throttledMouseMove = useCallback(throttle(handleMouseMove, 16), [handleMouseMove]);
+
   const handleTouchMove = (e) => {
     const touch = e.touches[0];
-    handleMouseMove({ clientX: touch.clientX, clientY: touch.clientY });
+    throttledMouseMove({ clientX: touch.clientX, clientY: touch.clientY });
   };
 
   const handleMouseUp = () => {
     setDragging(false);
-    setShowLine(false);
+    setShowVerticalLine(false);
+    setShowHorizontalLine(false);
     drawTextOnCanvas();
   };
 
@@ -197,7 +201,7 @@ const Canvas = ({
         }}
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
-        onMouseMove={handleMouseMove}
+        onMouseMove={throttledMouseMove}
         onTouchMove={handleTouchMove}
         onMouseUp={handleMouseUp}
         onTouchEnd={handleTouchEnd}
@@ -210,3 +214,15 @@ const Canvas = ({
 };
 
 export default Canvas;
+
+// Utility function to throttle the mouse/touch move events
+function throttle(func, limit) {
+  let inThrottle;
+  return function (...args) {
+    if (!inThrottle) {
+      func.apply(this, args);
+      inThrottle = true;
+      setTimeout(() => (inThrottle = false), limit);
+    }
+  };
+}

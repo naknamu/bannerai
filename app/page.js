@@ -105,8 +105,8 @@ export default function Home() {
     <div className={style.page_container}>
       <div className={style.input_container}>
         <div className={style.hero}>
-          <h1>Create Beautiful Graphics</h1>
-          <h1>In One Click!</h1>
+          <h1>Create <span style={{color: "var(--accent)"}}>Beautiful</span> Graphics</h1>
+          <h1>in <span className={style.wavy_underline}>One Click</span></h1>
           {/* <Link href="/sandbox">Sandbox</Link> */}
         </div>
 
