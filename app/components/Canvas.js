@@ -22,29 +22,21 @@ const Canvas = ({
   const [dragging, setDragging] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [showLine, setShowLine] = useState(false);
+  const [lastDrawTime, setLastDrawTime] = useState(0);
 
   const drawTextOnCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(
-      offscreenCanvasRef.current,
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
+    ctx.drawImage(offscreenCanvasRef.current, 0, 0, canvas.width, canvas.height);
 
-    // Draw the line if the flag is true
     if (showLine) {
       ctx.strokeStyle = "purple";
       ctx.lineWidth = 2;
-      // Draw horizontal line
       ctx.beginPath();
       ctx.moveTo(0, canvas.height / 2);
       ctx.lineTo(canvas.width, canvas.height / 2);
       ctx.stroke();
-      // Draw vertical line
       ctx.beginPath();
       ctx.moveTo(canvas.width / 2, 0);
       ctx.lineTo(canvas.width / 2, canvas.height);
@@ -55,21 +47,14 @@ const Canvas = ({
     ctx.fillStyle = color;
 
     const lines = text.split("\n");
-    const lineHeight = fontSize * 1.2; // Adjust the line height as needed
+    const lineHeight = fontSize * 1.2;
 
+    ctx.save();
     lines.forEach((line, index) => {
       ctx.fillText(line, position.x, position.y + index * lineHeight);
     });
-  }, [
-    boldText,
-    italicText,
-    fontSize,
-    selectedFont,
-    color,
-    text,
-    position,
-    showLine,
-  ]);
+    ctx.restore();
+  }, [boldText, italicText, fontSize, selectedFont, color, text, position, showLine]);
 
   const drawImageOnOffscreenCanvas = useCallback(() => {
     const offscreenCanvas = offscreenCanvasRef.current;
@@ -80,23 +65,11 @@ const Canvas = ({
 
     const img = imgRef.current;
     if (img.complete) {
-      offscreenCtx.drawImage(
-        img,
-        0,
-        0,
-        offscreenCanvas.width,
-        offscreenCanvas.height
-      );
+      offscreenCtx.drawImage(img, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
       drawTextOnCanvas();
     } else {
       img.onload = () => {
-        offscreenCtx.drawImage(
-          img,
-          0,
-          0,
-          offscreenCanvas.width,
-          offscreenCanvas.height
-        );
+        offscreenCtx.drawImage(img, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
         drawTextOnCanvas();
       };
     }
@@ -138,10 +111,8 @@ const Canvas = ({
 
     const ctx = canvas.getContext("2d");
     const lines = text.split("\n");
-    const textWidth = Math.max(
-      ...lines.map((line) => ctx.measureText(line).width)
-    );
-    const textHeight = fontSize * lines.length * 1.2; // Adjust the line height as needed
+    const textWidth = Math.max(...lines.map((line) => ctx.measureText(line).width));
+    const textHeight = fontSize * lines.length * 1.2;
 
     if (
       mouseX >= position.x &&
@@ -152,6 +123,11 @@ const Canvas = ({
       setDragging(true);
       setOffset({ x: mouseX - position.x, y: mouseY - position.y });
     }
+  };
+
+  const handleTouchStart = (e) => {
+    const touch = e.touches[0];
+    handleMouseDown({ clientX: touch.clientX, clientY: touch.clientY });
   };
 
   const handleMouseMove = (e) => {
@@ -165,28 +141,44 @@ const Canvas = ({
 
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
-      const threshold = 10; // Pixels within which to show the red line
+      const threshold = fontSize;
 
       requestAnimationFrame(() => {
-        const newPosition = { x: mouseX - offset.x, y: mouseY - offset.y };
-        setPosition(newPosition);
+        const currentTime = Date.now();
+        if (currentTime - lastDrawTime > 16) {
+          setLastDrawTime(currentTime);
 
-        if (
-          Math.abs(newPosition.x - centerX) < threshold ||
-          Math.abs(newPosition.y - centerY) < threshold
-        ) {
-          setShowLine(true);
+          const newPosition = { x: mouseX - offset.x, y: mouseY - offset.y };
+          setPosition(newPosition);
+
+          if (
+            Math.abs(newPosition.x - centerX) < threshold ||
+            Math.abs(newPosition.y - centerY) < threshold
+          ) {
+            setShowLine(true);
+          } else {
+            setShowLine(false);
+          }
+
+          drawTextOnCanvas();
         }
-
-        drawTextOnCanvas();
       });
     }
   };
 
+  const handleTouchMove = (e) => {
+    const touch = e.touches[0];
+    handleMouseMove({ clientX: touch.clientX, clientY: touch.clientY });
+  };
+
   const handleMouseUp = () => {
     setDragging(false);
-    setShowLine(false); // Remove the line when dragging stops
+    setShowLine(false);
     drawTextOnCanvas();
+  };
+
+  const handleTouchEnd = () => {
+    handleMouseUp();
   };
 
   return (
@@ -200,14 +192,17 @@ const Canvas = ({
         width={size.w}
         height={size.h}
         style={{
-          // border: "1px solid black",
           width: displaySize.w,
           height: displaySize.h,
         }}
         onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
         onMouseMove={handleMouseMove}
+        onTouchMove={handleTouchMove}
         onMouseUp={handleMouseUp}
+        onTouchEnd={handleTouchEnd}
         onMouseLeave={handleMouseUp}
+        onTouchCancel={handleTouchEnd}
       />
       <canvas ref={offscreenCanvasRef} style={{ display: "none" }} />
     </>

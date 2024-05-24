@@ -38,6 +38,7 @@
 
   .canvas_container > canvas {
     max-width: 100%;
+    touch-action: none;
   }
 
   .hero > h1 {
