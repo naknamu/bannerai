@@ -15,4 +15,12 @@
     padding: 0 3rem;
     font-size: 0.8em;
 }
+
+/* Mobile */
+@media (max-width: 700px) {
+    .container {
+      padding: 0 10px;
+    }
+  
+}
   
