@@ -18,7 +18,7 @@ const Navbar = () => {
         </Link>
         <ul className={style.navbarNav}>
           <li className={style.navItem}>
-            <a href="#home" className={style.navLink}>
+            <a href="/" className={style.navLink}>
               Home
             </a>
           </li>
@@ -33,7 +33,7 @@ const Navbar = () => {
             </a>
           </li>
           <li className={style.navItem}>
-            <a href="#services" className={style.navLink}>
+            <a href="/FAQ" className={style.navLink}>
               FAQ
             </a>
           </li>

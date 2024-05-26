@@ -23,3 +23,7 @@ a:hover {
 h1 , h4 {
   color: var(--dark);
 }
+
+.container {
+  padding: 1rem 3rem;
+}
