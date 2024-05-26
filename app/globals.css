@@ -26,4 +26,11 @@ h1 , h4 {
 
 .container {
   padding: 1rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+ul {
+  padding: 1rem;
 }

@@ -18,8 +18,8 @@ export default function FrequentlyAsked() {
         </AccordionSummary>
         <AccordionDetails>
           <Typography>
-            BannerAI is a website that lets you create graphics of any sort with
-            just one click.
+            BannerAI is a website that lets you create graphics of any kind with
+            just one click using the power of AI.
           </Typography>
         </AccordionDetails>
       </Accordion>

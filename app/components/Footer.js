@@ -7,7 +7,7 @@ const Footer = () => {
       <div className={style.container}>
         <span>
             <span>
-            <Link href="#">Privacy Policy</Link>
+            <Link href="/legal/privacy-policy">Privacy Policy</Link>
             <span> • </span>
             <Link href="#">Terms of Service</Link>
             </span>
