@@ -6,7 +6,6 @@ import style from "./page.module.css";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import CircularProgress from "@mui/material/CircularProgress";
-import Link from "next/link";
 import Canvas from "./components/Canvas";
 import Tooltip from "@mui/material/Tooltip";
 import FontStyles from "./components/FontStyles";
@@ -29,7 +28,7 @@ const IMAGE_SIZES = [
 const GENERATION_LIMIT = parseInt(process.env.NEXT_PUBLIC_GENERATION_LIMIT);
 
 export default function Home() {
-  const [title, setTitle] = useState("sunset by the seashore");
+  const [title, setTitle] = useState("");
   const [detail, setDetail] = useState("");
   const [base64String, setBase64String] = useState("");
   // const [isGenerated, setIsGenerated] = useState(true);
@@ -112,7 +111,6 @@ export default function Home() {
           <h1>
             in <span className={style.wavy_underline}>One Click</span>
           </h1>
-          {/* <Link href="/sandbox">Sandbox</Link> */}
         </div>
 
         <TextField
