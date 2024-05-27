@@ -61,7 +61,7 @@ export default function Home() {
   function incrementGenerationCount() {
     let count = parseInt(getCookie("generationCount")) || 0;
     count++;
-    setCookie("generationCount", count, { maxAge: 20 });
+    setCookie("generationCount", count, { maxAge: 86400 });
     router.refresh();
 
     // Limit to 10 generations
