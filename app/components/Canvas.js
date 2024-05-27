@@ -58,7 +58,7 @@ const Canvas = ({
       ctx.fillText(line, position.x, position.y + index * lineHeight);
     });
     ctx.restore();
-  }, [boldText, italicText, fontSize, selectedFont, color, text, position, showVerticalLine, showHorizontalLine]);
+  }, [boldText, italicText, fontSize, selectedFont, color, text, position, showVerticalLine, showHorizontalLine, offscreenCanvasRef]);
 
   const drawImageOnOffscreenCanvas = useCallback(() => {
     const offscreenCanvas = offscreenCanvasRef.current;
@@ -77,7 +77,7 @@ const Canvas = ({
         drawTextOnCanvas();
       };
     }
-  }, [size, drawTextOnCanvas]);
+  }, [size, drawTextOnCanvas, offscreenCanvasRef]);
 
   useEffect(() => {
     if (typeof window === "undefined" || !selectedFont) return;

@@ -18,7 +18,7 @@ export default function ContactForm() {
           paddingTop: "2rem",
         }}
       >
-        <p>Thank you! We'll get in touch with you shortly. 🍺</p>
+        <p>Thank you! We&#39;ll get in touch with you shortly. 🍺</p>
         <span>
           Go back to ➡ <Link href="/">Home</Link>
         </span>
