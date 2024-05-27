@@ -33,7 +33,7 @@ export default function Home() {
   const [base64String, setBase64String] = useState("");
   // const [isGenerated, setIsGenerated] = useState(true);
   const [isGenerated, setIsGenerated] = useState(false);
-  const [isDetailEmpty, setIsDetailEmpty] = useState(true);
+  const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [color, setColor] = useState("#fff");
   const [fontSize, setFontSize] = useState(75);
@@ -73,11 +73,14 @@ export default function Home() {
 
   const handleGenerate = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
 
+    // Check if details of the image has value
     if (detail === "") {
-      setIsDetailEmpty(true);
+      setIsError(true);
       return;
+    } else {
+      setIsError(false);
+      setIsLoading(true);
     }
 
     // Call this function before generating an image
@@ -126,8 +129,8 @@ export default function Home() {
           variant="outlined"
           onChange={(e) => setDetail(e.target.value)}
           required
-          error={!isDetailEmpty}
-          helperText={!isDetailEmpty ? "Required field." : ""}
+          error={isError}
+          helperText={isError ? "Required field." : ""}
           multiline
           maxRows={5}
         />
