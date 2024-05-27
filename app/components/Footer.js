@@ -9,7 +9,7 @@ const Footer = () => {
             <span>
             <Link href="/legal/privacy-policy">Privacy Policy</Link>
             <span> • </span>
-            <Link href="#">Terms of Service</Link>
+            <Link href="/legal/terms-and-conditions">Terms and Conditions</Link>
             </span>
         </span>
         <span>© 2024 BannerAI. All rights reserved.</span>
