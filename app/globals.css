@@ -34,3 +34,13 @@ h1 , h4 {
 ul {
   padding: 1rem;
 }
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+footer {
+  margin-top: auto;
+}

@@ -14,7 +14,6 @@ export default function ContactForm() {
       <div
         className="container"
         style={{
-          height: "100vh",
           paddingTop: "2rem",
         }}
       >
@@ -30,7 +29,6 @@ export default function ContactForm() {
     <div
       style={{
         maxWidth: "800px",
-        height: "100vh",
         paddingTop: "2rem",
       }}
     >

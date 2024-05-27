@@ -7,7 +7,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 export default function FrequentlyAsked() {
   return (
-    <div className="container" style={{ height: "100vh" }}>
+    <div className="container">
       <Accordion defaultExpanded>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
