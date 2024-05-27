@@ -26,7 +26,7 @@ const IMAGE_SIZES = [
   // { w: 640, h: 1536 },
 ];
 
-const GENERATION_LIMIT = 10;
+const GENERATION_LIMIT = parseInt(process.env.NEXT_PUBLIC_GENERATION_LIMIT);
 
 export default function Home() {
   const [title, setTitle] = useState("sunset by the seashore");

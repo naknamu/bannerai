@@ -67,9 +67,10 @@ export default function FrequentlyAsked() {
         </AccordionSummary>
         <AccordionDetails>
           <Typography>
-            BannerAI can be used to generate up to 10 graphics per day for free;
-            no sign-up is required. A pro version will be created soon, which
-            lets you generate unlimited graphics.
+            BannerAI can be used to generate up to
+            {` ${process.env.NEXT_PUBLIC_GENERATION_LIMIT}`} graphics
+            per day for free; no sign-up is required. A pro version will be
+            created soon, which lets you generate unlimited graphics.
           </Typography>
         </AccordionDetails>
       </Accordion>
