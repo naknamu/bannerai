@@ -23,7 +23,9 @@ const Canvas = ({
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [showVerticalLine, setShowVerticalLine] = useState(false);
   const [showHorizontalLine, setShowHorizontalLine] = useState(false);
+  const animationFrameIdRef = useRef(null);
 
+  // Draw text on canvas
   const drawTextOnCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
@@ -53,13 +55,12 @@ const Canvas = ({
     const lines = text.split("\n");
     const lineHeight = fontSize * 1.2;
 
-    ctx.save();
     lines.forEach((line, index) => {
       ctx.fillText(line, position.x, position.y + index * lineHeight);
     });
-    ctx.restore();
   }, [boldText, italicText, fontSize, selectedFont, color, text, position, showVerticalLine, showHorizontalLine, offscreenCanvasRef]);
 
+  // Draw image on offscreen canvas
   const drawImageOnOffscreenCanvas = useCallback(() => {
     const offscreenCanvas = offscreenCanvasRef.current;
     const offscreenCtx = offscreenCanvas.getContext("2d");
@@ -79,6 +80,7 @@ const Canvas = ({
     }
   }, [size, drawTextOnCanvas, offscreenCanvasRef]);
 
+  // Load font and redraw canvas
   useEffect(() => {
     if (typeof window === "undefined" || !selectedFont) return;
 
@@ -97,6 +99,7 @@ const Canvas = ({
     loadFont();
   }, [selectedFont, drawTextOnCanvas]);
 
+  // Load image and draw on canvas
   useEffect(() => {
     if (typeof window === "undefined") return;
     const img = new Image();
@@ -105,13 +108,14 @@ const Canvas = ({
     drawImageOnOffscreenCanvas();
   }, [imgSource, drawImageOnOffscreenCanvas]);
 
-  const handleMouseDown = (e) => {
+  // Mouse and touch event handlers
+  const handleDown = (clientX, clientY) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-    const mouseX = (e.clientX - rect.left) * scaleX;
-    const mouseY = (e.clientY - rect.top) * scaleY;
+    const mouseX = (clientX - rect.left) * scaleX;
+    const mouseY = (clientY - rect.top) * scaleY;
 
     const ctx = canvas.getContext("2d");
     const lines = text.split("\n");
@@ -129,23 +133,17 @@ const Canvas = ({
     }
   };
 
-  const handleTouchStart = (e) => {
-    const touch = e.touches[0];
-    handleMouseDown({ clientX: touch.clientX, clientY: touch.clientY });
-  };
-
-  const handleMouseMove = (e) => {
+  const handleMove = (clientX, clientY) => {
     if (dragging) {
       const canvas = canvasRef.current;
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / rect.width;
       const scaleY = canvas.height / rect.height;
-      const mouseX = (e.clientX - rect.left) * scaleX;
-      const mouseY = (e.clientY - rect.top) * scaleY;
+      const mouseX = (clientX - rect.left) * scaleX;
+      const mouseY = (clientY - rect.top) * scaleY;
 
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
-      const threshold = fontSize;
 
       const newPosition = { x: mouseX - offset.x, y: mouseY - offset.y };
       setPosition(newPosition);
@@ -155,34 +153,31 @@ const Canvas = ({
       const textWidth = Math.max(...lines.map((line) => ctx.measureText(line).width));
       const textHeight = fontSize * lines.length * 1.2;
 
-      const nearVerticalCenter =
-        (newPosition.x <= centerX && newPosition.x + textWidth >= centerX);
-      const nearHorizontalCenter =
-        (newPosition.y - fontSize <= centerY && newPosition.y + textHeight - fontSize >= centerY);
+      const nearVerticalCenter = newPosition.x <= centerX && newPosition.x + textWidth >= centerX;
+      const nearHorizontalCenter = newPosition.y - fontSize <= centerY && newPosition.y + textHeight - fontSize >= centerY;
 
       setShowVerticalLine(nearVerticalCenter);
       setShowHorizontalLine(nearHorizontalCenter);
 
-      drawTextOnCanvas();
+      // Use requestAnimationFrame for smooth drawing
+      if (animationFrameIdRef.current) {
+        cancelAnimationFrame(animationFrameIdRef.current);
+      }
+      animationFrameIdRef.current = requestAnimationFrame(() => {
+        drawTextOnCanvas();
+      });
     }
   };
 
-  const throttledMouseMove = useCallback(throttle(handleMouseMove, 16), [handleMouseMove]);
-
-  const handleTouchMove = (e) => {
-    const touch = e.touches[0];
-    throttledMouseMove({ clientX: touch.clientX, clientY: touch.clientY });
-  };
-
-  const handleMouseUp = () => {
+  const handleMouseDown = (e) => handleDown(e.clientX, e.clientY);
+  const handleTouchStart = (e) => handleDown(e.touches[0].clientX, e.touches[0].clientY);
+  const handleMouseMove = (e) => handleMove(e.clientX, e.clientY);
+  const handleTouchMove = (e) => handleMove(e.touches[0].clientX, e.touches[0].clientY);
+  const handleUp = () => {
     setDragging(false);
     setShowVerticalLine(false);
     setShowHorizontalLine(false);
     drawTextOnCanvas();
-  };
-
-  const handleTouchEnd = () => {
-    handleMouseUp();
   };
 
   return (
@@ -201,12 +196,12 @@ const Canvas = ({
         }}
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
-        onMouseMove={throttledMouseMove}
+        onMouseMove={handleMouseMove}
         onTouchMove={handleTouchMove}
-        onMouseUp={handleMouseUp}
-        onTouchEnd={handleTouchEnd}
-        onMouseLeave={handleMouseUp}
-        onTouchCancel={handleTouchEnd}
+        onMouseUp={handleUp}
+        onTouchEnd={handleUp}
+        onMouseLeave={handleUp}
+        onTouchCancel={handleUp}
       />
       <canvas ref={offscreenCanvasRef} style={{ display: "none" }} />
     </>
@@ -214,15 +209,3 @@ const Canvas = ({
 };
 
 export default Canvas;
-
-// Utility function to throttle the mouse/touch move events
-function throttle(func, limit) {
-  let inThrottle;
-  return function (...args) {
-    if (!inThrottle) {
-      func.apply(this, args);
-      inThrottle = true;
-      setTimeout(() => (inThrottle = false), limit);
-    }
-  };
-}
