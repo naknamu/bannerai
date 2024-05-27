@@ -18,7 +18,7 @@ const FontPicker = ({ selectedFont, setSelectedFont }) => {
     };
 
     fetchFonts();
-  }, []);
+  }, [setSelectedFont]);
 
   return (
     <div>
