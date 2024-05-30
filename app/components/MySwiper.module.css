@@ -1,0 +1,15 @@
+.container {
+    max-width: 500px; 
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .container {
+        max-width: 100%;
+    }
+
+    .container img {
+        height: 100%;
+    }
+  
+}

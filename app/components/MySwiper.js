@@ -8,13 +8,15 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 
+import style from "./MySwiper.module.css"
+
 // import required modules
 import { Pagination, Autoplay } from "swiper/modules";
 import Image from "next/image";
 
 export default function MySwiper() {
   return (
-    <div style={{ width: "500px", height: "500px", alignSelf: "center" }}>
+    <div className={style.container}>
       <Swiper
         pagination={true}
         autoplay={{
@@ -27,20 +29,7 @@ export default function MySwiper() {
         <SwiperSlide>
           <Image
             src={"/static/images/swiper/birthday_card.png"}
-            width={500}
-            height={500}
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <Image
-            src={"/static/images/swiper/merry_christmas.png"}
-            width={500}
-            height={500}
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <Image
-            src={"/static/images/swiper/book_cover.png"}
+            alt="birthday card"
             width={500}
             height={500}
           />
@@ -48,6 +37,23 @@ export default function MySwiper() {
         <SwiperSlide>
           <Image
             src={"/static/images/swiper/quotes.png"}
+            alt="a quote card"
+            width={500}
+            height={500}
+          />
+        </SwiperSlide>
+        <SwiperSlide>
+          <Image
+            src={"/static/images/swiper/book_cover.png"}
+            alt="book cover card"
+            width={500}
+            height={500}
+          />
+        </SwiperSlide>
+        <SwiperSlide>
+          <Image
+            src={"/static/images/swiper/merry_christmas.png"}
+            alt="merry christmas card"
             width={500}
             height={500}
           />
@@ -55,6 +61,7 @@ export default function MySwiper() {
         <SwiperSlide>
           <Image
             src={"/static/images/swiper/sunset.png"}
+            alt="a painting of sunset by the seashore"
             width={500}
             height={500}
           />
@@ -62,6 +69,7 @@ export default function MySwiper() {
         <SwiperSlide>
           <Image
             src={"/static/images/swiper/wedding.png"}
+            alt="a wedding invitation card"
             width={500}
             height={500}
           />

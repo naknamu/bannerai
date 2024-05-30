@@ -13,6 +13,8 @@ import ImageSizes from "./components/ImageSizes";
 import Download from "./components/Download";
 import { setCookie, getCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
+import MySwiper from "./components/MySwiper";
+import Link from "next/link";
 
 const IMAGE_SIZES = [
   { w: 1024, h: 1024 },
@@ -114,6 +116,7 @@ export default function Home() {
           <h1>
             in <span className={style.wavy_underline}>One Click</span>
           </h1>
+          {/* <Link href="/sandbox">Sandbox</Link> */}
         </div>
 
         <TextField
@@ -178,8 +181,8 @@ export default function Home() {
         )}
       </div>
 
-      {isGenerated && (
-        <div className={style.canvas_container}>
+      <div className={style.canvas_container}>
+        {isGenerated ? (
           <Canvas
             text={title}
             color={color}
@@ -196,8 +199,10 @@ export default function Home() {
             position={position}
             setPosition={setPosition}
           />
-        </div>
-      )}
+        ) : (
+          <MySwiper />
+        )}
+      </div>
 
       {isLoading && <CircularProgress />}
     </div>
