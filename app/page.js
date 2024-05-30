@@ -108,7 +108,7 @@ export default function Home() {
       <div className={style.input_container}>
         <div className={style.hero}>
           <h1>
-            Create <span style={{ color: "var(--accent)" }}>Beautiful</span>{" "}
+            Create <span style={{ color: "var(--accent)" }}>Simple</span>{" "}
             Graphics
           </h1>
           <h1>

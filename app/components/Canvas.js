@@ -172,13 +172,24 @@ const Canvas = ({
   const handleMouseDown = (e) => handleDown(e.clientX, e.clientY);
   const handleTouchStart = (e) => handleDown(e.touches[0].clientX, e.touches[0].clientY);
   const handleMouseMove = (e) => handleMove(e.clientX, e.clientY);
-  const handleTouchMove = (e) => handleMove(e.touches[0].clientX, e.touches[0].clientY);
+  const handleTouchMove = (e) => {
+    e.preventDefault(); // Prevent scrolling while dragging
+    handleMove(e.touches[0].clientX, e.touches[0].clientY);
+  };
   const handleUp = () => {
     setDragging(false);
     setShowVerticalLine(false);
     setShowHorizontalLine(false);
     drawTextOnCanvas();
   };
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
+    return () => {
+      canvas.removeEventListener("touchmove", handleTouchMove);
+    };
+  }, [handleTouchMove]);
 
   return (
     <>
@@ -197,9 +208,8 @@ const Canvas = ({
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
         onMouseMove={handleMouseMove}
-        onTouchMove={handleTouchMove}
-        onMouseUp={handleUp}
         onTouchEnd={handleUp}
+        onMouseUp={handleUp}
         onMouseLeave={handleUp}
         onTouchCancel={handleUp}
       />
